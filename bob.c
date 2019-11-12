@@ -80,26 +80,26 @@ int main()
   init();
 
    /* presentazione */
-  printf("\x1b[2J\x1b[1;1H\nquanta_: criptazione quantica (bob) \n");
+  printf("\x1b[2J\x1b[1;1H\nquanta_: criptazione quantistica (bob) \n");
   printf("\x1b[1;1H");
   printf("(C)Scuola_Sisini 2019 https://pumar.it\n\n\n\r");
-
-  printf("CTRL-<a> chiedi ad alice di inviare un qubit\n\r");
-  printf("CTRL-<s> salva il qubit nella chiave\n\r");
-  printf("<i> scegli la base per Alice\n\r");
-  printf("<c> chiede ad alice che base ha usato\n\r");
-  printf("<b> cambia la tua base\n\r");
-  printf("____________________________________________________\n\r");
+  printf("________________________________________________________________\n\r");
+  printf("CTRL-<a> chiede ad Alice di inviare un qubit a Bob\n\r");
+  printf("CTRL-<s> salva il qubit nella chiave di Bob e Alice\n\r");
+  printf("     <i> cambia la base per Alice\n\r");
+  printf("     <c> chiede ad Alice che base ha usato per inviare il qubit\n\r");
+  printf("     <b> cambia la base di Bob\n\r");
+  printf("_________________________________________________________________\n\r");
   printf("FRECCE SX/DX cursore a sinistra/destra\n\r");
   printf("CTRL-<c> verifica con alice il  qubit sotto il curosre\n\r");
   printf("CTRL-<k> elimina qubit sotto il curosre\n\r");
-  printf("____________________________________________________\n\r");
+  printf("_________________________________________________________________\n\r");
   printf("CTRL-<w> accetta la chiave\n\r");
   printf("CTRL-<x> rifiuta la chiave\n\r");
   
   
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA);
-  printf("\x1b[%d;1H|qubit rivelato|Base Alice   |Base Bob    |",RIGA+1);
+  printf("\x1b[%d;1H|Qubit rivelato|Base Alice   |Base Bob    |",RIGA+1);
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA+2);
   printf("\x1b[%d;1H|              |              |           |",RIGA+3);
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA+4);
@@ -330,6 +330,7 @@ int main()
                 {
                   if(chiave_bob[i].accettato == 1)
                     {
+                      //il flag è zero se le due chiavi non corrispondono
                       chiavi_flag = chiavi_flag && chiave_bob[i].polarizzazione == chiave_alice[i].polarizzazione;
                       printf("\x1b[%d;1HCHIAVE Bob  :\x1b[%d;%dH%d",RIGA+10,RIGA+10,14+i,chiave_bob[i].polarizzazione);
                       printf("\x1b[%d;1HCHIAVE Alice:\x1b[%d;%dH%d",RIGA+11,RIGA+11,14+i,chiave_alice[i].polarizzazione);
@@ -346,6 +347,7 @@ int main()
                 {
                    printf("\x1b[%d;%dHMALE: le chiavi NON corrispondono",RIGA+12,1);
                 }
+              fflush(stdout);
               if(eva_flag)
                 {
                   for(int i=0; i<indice_qubit_chiave_bob;i++)
