@@ -1,0 +1,141 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+/*_____________________________________
+
+               Alice e Bob
+            @francesco_sisini
+             _scuola_sisini_
+ */
+
+#define DIM_CHIAVE 32
+
+typedef enum
+  {
+    VERTICALE = 0,
+    ORIZZONTALE
+  } POLARIZZAZIONE;
+
+typedef enum
+  {
+    STANDARD,
+    HADAMARD
+  } BASE;
+
+typedef struct
+{
+  POLARIZZAZIONE polarizzazione;
+  BASE base;
+  
+} FOTONE;
+
+typedef struct qnodo {
+  POLARIZZAZIONE polarizzazione;
+  char accettato;
+} QNODO;
+
+
+
+/*____________________________________________________*/
+FOTONE quanto_bob2alice_emetti_fotone(QNODO alice_qubits[],int * indice);
+
+POLARIZZAZIONE quanto_bob2rivelatore_rivela_fotone(FOTONE f);
+
+BASE classico_bob2alice_richiedi_base(FOTONE f);
+
+char classico_bob2aliceconferma_polarizzazione(POLARIZZAZIONE p);
+
+/*____________________________________________________*/
+void scrivi_qubit(POLARIZZAZIONE p, QNODO * chiave);
+
+void elimina_qubit(QNODO * qn);
+
+
+/*____________________________________________________*/
+int main()
+{
+  QNODO  chiave_bob[DIM_CHIAVE];
+  QNODO  chiave_alice[DIM_CHIAVE];
+
+  /* qubit attivo su cui scrivere */
+  int indice_qubit_chiave_bob=0;
+  int indice_qubit_chiave_alice=0;
+
+  int n_qubit_segnati = 0;
+
+  srand(time(0));
+
+  FOTONE bob_f;
+  while(n_qubit_segnati<DIM_CHIAVE)
+    {
+      bob_f = quanto_bob2alice_emetti_fotone(chiave_alice,&indice_qubit_chiave_alice);
+      chiave_bob[indice_qubit_chiave_bob].polarizzazione = bob_f.polarizzazione;
+      chiave_bob[indice_qubit_chiave_bob].accettato = 1;
+
+      /* controlla se le basi corrispondono */
+      if(1 == 1)
+        {
+          n_qubit_segnati ++;
+          indice_qubit_chiave_bob ++;
+        }
+    }
+
+   for(int i=0;i<DIM_CHIAVE;i++)
+    {
+      printf("%d\t",chiave_bob[i].polarizzazione);
+
+    }
+
+}
+
+/*_____________________________________________________
+ 
+  Bob chiede ad alice di emettere un fotone
+  Alice sceglie una base ed emette una copia
+  di fotoni che hanno lo stesso stato quantico
+  uno viene rivelato dal rivelatore di alice
+  che inserisce nella sua chiave il valore
+  di polarizzazione misurato
+  l'latro viene mandato a Bob che lo rivela e 
+  inserisce a sua volta il valore di polarizzazione
+  nella sua chiave
+ */
+FOTONE quanto_bob2alice_emetti_fotone(QNODO  alice_qubits[],int* indice_chiave_alice)
+{
+  POLARIZZAZIONE p;
+  BASE b;
+
+  float classico_scelta = (float)rand()/(float)RAND_MAX;
+
+   if(classico_scelta>0.5)
+    {
+      b = STANDARD;
+    }
+  else
+    {
+      b = HADAMARD;
+    }
+
+  float quanto_psi2 = (float)rand()/(float)RAND_MAX;
+
+  if(quanto_psi2>0.5)
+    {
+      p = VERTICALE;
+    }
+  else
+    {
+      p = ORIZZONTALE;
+    }
+
+   FOTONE f;
+   f.base = b;
+   f.polarizzazione = p;
+
+   alice_qubits[*indice_chiave_alice].polarizzazione = p;
+   alice_qubits[*indice_chiave_alice].accettato = 1;
+   (*indice_chiave_alice)++; 
+   return f;
+  
+}
+
