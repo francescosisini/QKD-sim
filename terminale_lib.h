@@ -31,3 +31,4 @@ enum editorKey {
 
 int init();
 int leggi_tastiera();
+void terminale_cucinato();

@@ -12,8 +12,9 @@
  */
 
 #define DIM_CHIAVE 32
-#define RIGA 18
-#define DR 5
+#define RIGA 12
+#define DR 16
+#define DR2 16
 #define COLONNA 19
 
 typedef enum
@@ -83,29 +84,32 @@ int main()
   printf("\x1b[2J\x1b[1;1H\nquanta_: criptazione quantistica (bob) \n");
   printf("\x1b[1;1H");
   printf("(C)Scuola_Sisini 2019 https://pumar.it\n\n\n\r");
-  printf("________________________________________________________________\n\r");
-  printf("CTRL-<a> chiede ad Alice di inviare un qubit a Bob\n\r");
-  printf("CTRL-<s> salva il qubit nella chiave di Bob e Alice\n\r");
-  printf("     <i> cambia la base per Alice\n\r");
-  printf("     <c> chiede ad Alice che base ha usato per inviare il qubit\n\r");
-  printf("     <b> cambia la base di Bob\n\r");
   printf("_________________________________________________________________\n\r");
-  printf("FRECCE SX/DX cursore a sinistra/destra\n\r");
-  printf("CTRL-<c> verifica con alice il  qubit sotto il curosre\n\r");
-  printf("CTRL-<k> elimina qubit sotto il curosre\n\r");
-  printf("_________________________________________________________________\n\r");
-  printf("CTRL-<w> accetta la chiave\n\r");
-  printf("CTRL-<x> rifiuta la chiave\n\r");
-  
+  printf("     <a> ricevi fotone       (c. quantistico)\n\r");
+  printf("CTRL-<s> salva qubit         (locale)\n\r");
+  printf("     <i> vedi base Alice     (c. classico)\n\r");
+  printf("CTRL-<i> imposta base Alice  (c. classico)\n\r");
+  printf("CTRL-<b> imposta base Bob    (locale)\n\r");
+  printf("_________________________________________________________________\n\r"); 
   
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA);
   printf("\x1b[%d;1H|Qubit rivelato|Base Alice   |Base Bob    |",RIGA+1);
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA+2);
   printf("\x1b[%d;1H|              |              |           |",RIGA+3);
   printf("\x1b[%d;1H|-----------------------------------------|",RIGA+4);
-   printf("\x1b[%d;1H|Qubit salvati  :",RIGA+5);
-  printf("\x1b[%d;1H|CHIAVE Bob  :",RIGA+6);
-  printf("\x1b[%d;1H|CHIAVE Alice:",RIGA+7);
+
+  printf("\n\r\n\r");
+  printf("\n\r_________________________________________________________________\n\r");
+  printf("FRECCE SX/DX  seleziona qubit\n\r");
+  printf("     <c>      confronta qubit selezionato\n\r");
+  printf("CTRL-<k>      elimina qubit selezionato\n\r");
+  printf("CTRL-<w>      accetta la chiave\n\r");
+  printf("CTRL-<x>      rifiuta la chiave\n\r");
+  printf("_________________________________________________________________\n\r");
+  printf("\x1b[%d;1HQubit salvati :",RIGA+5+11);
+  printf("\x1b[%d;1HCHIAVE Bob    :",RIGA+6+11);
+  printf("\x1b[%d;1HCHIAVE Alice  :",RIGA+7+11);
+  fflush(stdout);
 
   //Flag di intrusione di Eva
   char eva_flag = 0;
@@ -114,18 +118,22 @@ int main()
   char chiavi_flag = 1;
   
   //Riga e colonna del cursore
-  int riga = RIGA+DR;
+  int riga = RIGA+DR+1;
   int colonna = COLONNA;
-  //buffer per le descrizioni dei valori
+  //buffer per stringa di descrizioni
   char desc[15];
-  
+
+  //chiavi di criptazione
   QNODO  chiave_bob[DIM_CHIAVE];
   QNODO  chiave_alice[DIM_CHIAVE];
   QNODO  chiave_eva[DIM_CHIAVE];
 
   for(int i=0;i<DIM_CHIAVE;i++)
-    chiave_eva[i].accettato = -1;
-  
+    {
+      chiave_eva[i].accettato = -1;
+      chiave_bob[i].accettato = -1;
+      chiave_alice[i].accettato = -1;
+    }
    /* qubit attivo su cui scrivere */
   int indice_qubit_chiave_bob=0;
   int indice_qubit_chiave_alice=0;
@@ -142,312 +150,311 @@ int main()
   tc.tv_sec = 0.3;
   tc.tv_nsec =333333333;
   
-  
- 
-
   int n_qubit_segnati = 0;
 
   srand(time(0));
-
-  eva_flag = eva_intercetta();
-
-   descrizione(bob_base, desc,BASI);
-   printf("\x1b[%d;32H%s",RIGA+3,desc);
   
-
-  while(n_qubit_segnati<DIM_CHIAVE)
+  eva_flag = eva_intercetta();
+  
+  descrizione(bob_base, desc,BASI);
+  printf("\x1b[%d;32H%s",RIGA+3,desc);
+  
+  
+  
+  while(1)
     {
-      while(1)
+      int ch = leggi_tastiera();
+      printf("\x1b[%d;%dH",riga,colonna);
+      fflush(stdout);
+      
+      switch (ch)
         {
-          int ch = leggi_tastiera();
+          /* esci */
+        case CTRL_KEY('q'):
+          write(STDOUT_FILENO, "\x1b[2J", 4);
+          write(STDOUT_FILENO, "\x1b[H", 3);
+          write(STDOUT_FILENO,"\x1b[48:5:0m",9);
+          exit(0);
+          break;
           
-          switch (ch)
-            {      
-            case CTRL_KEY('q'):
-              write(STDOUT_FILENO, "\x1b[2J", 4);
-              write(STDOUT_FILENO, "\x1b[H", 3);
-              write(STDOUT_FILENO,"\x1b[48:5:0m",9);
+        case CTRL_KEY('x'):
+          write(STDOUT_FILENO, "\x1b[2J", 4);
+          write(STDOUT_FILENO, "\x1b[H", 3);
+          write(STDOUT_FILENO,"\x1b[48:5:0m",9);
+          exit(0);
+          break;
+          
+          /* mostra la chiave di Bob e quella di Alice e le confronta */
+        case CTRL_KEY('I'):
+          // Bob indica ad Alice la base da usare
+          if(alice_base == STANDARD)
+            alice_base = HADAMARD;
+          else if(alice_base == HADAMARD)
+            alice_base = INDETERMINATA;
+          else if(alice_base == INDETERMINATA)
+            alice_base = STANDARD;
+          
+          descrizione(alice_base, desc,BASI);
+          printf("\x1b[%d;17H%s",RIGA+3,desc);
+          
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+          
+          /* imposta base Bob */
+        case CTRL_KEY('B'):
+          //Bob cambia la propia base
+          if(bob_base == STANDARD)
+            bob_base = HADAMARD;
+          else
+            bob_base = STANDARD;
+          
+          descrizione(bob_base, desc,BASI);
+          printf("\x1b[%d;32H%s",RIGA+3,desc);
+          
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+          
+        case BACKSPACE:
+          break;
+          
+          /* Salva qubit */
+        case CTRL_KEY('S'):
+          //salva qubit nella chiave di Bob
+          chiave_bob[indice_qubit_chiave_bob].polarizzazione = pz;
+          chiave_bob[indice_qubit_chiave_bob].accettato = 1;
+          indice_qubit_chiave_bob++;
+          //salva qubit nella chiave di ALice
+          chiave_alice[indice_qubit_chiave_alice].polarizzazione = alice_f.polarizzazione;
+          chiave_alice[indice_qubit_chiave_alice].accettato = 1;
+          indice_qubit_chiave_alice++;
+          
+          for(int i=0; i<indice_qubit_chiave_bob;i++)
+            {
+              if(chiave_bob[i].accettato == 1)
+                printf("\x1b[%d;%dH%d",RIGA+DR2+1,COLONNA+i,chiave_bob[i].polarizzazione);
+              else
+                printf("\x1b[%d;%dH-",RIGA+DR2+1,COLONNA+i);
+            }
+          
+          //Cancella il qubit registrato dallo schermo
+          printf("\x1b[%d;9H-",RIGA+3);
+          
+          //Pone la base suggerita per alice ad indeterminata
+          alice_base = INDETERMINATA;
+          descrizione(alice_base, desc,BASI);
+          printf("\x1b[%d;17H%s",RIGA+3,desc);
+          
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+          
+        case CTRL_KEY('C'):
+          break;
+          
+           /* Elimina qubit selezionato */
+        case CTRL_KEY('K'):
+          //posizione del cursore rispetto l'inizio della sequenza di qubit salvati
+          inx = colonna-(COLONNA) ;
+          chiave_alice[inx].accettato=0 ;
+          chiave_bob[inx].accettato=0 ; 
+          printf("\x1b[%d;%dH-",riga,COLONNA+inx);
+          printf("\x1b[%d;%dH-",riga+1,COLONNA+inx);
+          
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+          
+          /* Accetta la chiave */
+        case CTRL_KEY('W'):
+          for(int i=0; i<indice_qubit_chiave_bob;i++)
+            {
+              if(chiave_bob[i].accettato == 1)
+                 {
+                   //il flag è zero se le due chiavi non corrispondono
+                   chiavi_flag = chiavi_flag && chiave_bob[i].polarizzazione == chiave_alice[i].polarizzazione;
+                   printf("\x1b[%d;1HCHIAVE Bob  :\x1b[%d;%dH%d",RIGA+DR+10,RIGA+DR+10,14+i,chiave_bob[i].polarizzazione);
+                   printf("\x1b[%d;1HCHIAVE Alice:\x1b[%d;%dH%d",RIGA+DR+11,RIGA+DR+11,14+i,chiave_alice[i].polarizzazione);
+                 }
+              fflush(stdout);
+            }
+          if(chiavi_flag)
+            {
+              printf("\x1b[%d;%dHBENE: le chiavi corrispondono",RIGA+DR+12,1);
+            }
+          else
+            {
+              printf("\x1b[%d;%dHMALE: le chiavi NON corrispondono",RIGA+DR+12,1);
+            }
+          
+          fflush(stdout);
+          
+          if(eva_flag)
+            {
+              printf("\x1b[%d;1H*****La comunicazione è stata intercettata*****",RIGA+DR+14);
+              for(int i=0; i<indice_qubit_chiave_bob;i++)
+                printf("\x1b[%d;1HCHIAVE Eva :\x1b[%d;%dH%d",RIGA+DR+15,RIGA+DR+15,14+i,chiave_eva[i].polarizzazione);
+              printf("\n\r");
+              fflush(stdout);
+              terminale_cucinato();
               exit(0);
-              break;
-              
-            case CTRL_KEY('A'):
-
-              /* una coppia di fotoni viene emessa nel sistema di Alice */
-
-                descrizione(alice_base, desc,BASI);
-                printf("\x1b[%d;17H%s",RIGA+3,desc);
-                fflush(stdout);
-              
-              if(eva_flag)
+            }
+          
+          printf("\x1b[%d;%dH",riga,colonna);
+          break;
+          
+          
+        case ARROW_UP:
+          break;
+          
+        case ARROW_DOWN:
+           break;
+           
+           /* cursore a sinistra */
+        case ARROW_LEFT:
+          if(colonna>COLONNA)
+            colonna--;
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+          
+          /* cursore a destra */
+        case ARROW_RIGHT:
+          if(colonna<COLONNA+DIM_CHIAVE)
+            colonna++;
+          printf("\x1b[%d;%dH",riga,colonna);
+          fflush(stdout);
+          break;
+        default:
+          if(32<=ch&&ch<=127)
+            {
+              /* Ricevi fotone */
+              if(ch == 'a')
                 {
-                  alice_f =  quanto_emetti_fotone(alice_base);
-                  bob_f=quanto_intercetta
-                    ( alice_f, alice_base,chiave_eva);
-                  //printf("\x1b[35;1Hbob: %d, Alice:%d",bob_f.polarizzazione,alice_f.polarizzazione);
-                }
-              else
-                {
-                  alice_f = quanto_emetti_fotone(alice_base);
-                  bob_f =  alice_f;
-                }
-              //->salva il qubit di Alice
-             
-
-              //->salva il qubit di Bob
-              pz = quanto_rivela_fotone(bob_f,bob_base);
-
-              if(pz)
-                {
-                  // evidenzia il nuovo qubit
-                  printf("\x1b[%d;6H>    | ",RIGA+3);
+                  /* una coppia di fotoni viene emessa nel sistema di Alice */
+                  descrizione(alice_base, desc,BASI);
+                  printf("\x1b[%d;17H%s",RIGA+3,desc);
                   fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H >   | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H  >  | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H   > | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H    >| ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H     * ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H     | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H       ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                }
-              else
-                {
-                  // evidenzia il nuovo qubit
-                  printf("\x1b[%d;6H>    | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H >   | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H  >  | ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H   > | ",RIGA+3);
-                  fflush(stdout);
-                  printf("\x1b[%d;6H    >| ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H     > ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H     |>",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
-                  printf("\x1b[%d;6H       ",RIGA+3);
-                  fflush(stdout);
-                  nanosleep(&tc, 0);
                   
-                }
-              printf("\x1b[%d;9H%d",RIGA+3,pz);
-
-              printf("\x1b[%d;%dH",riga,colonna);
-              fflush(stdout);
-              break;
-              
-              
-            case BACKSPACE:
-
-              break;
-            case CTRL_KEY('S'):
-              //salva qubit nella chiave di Bob
-              chiave_bob[indice_qubit_chiave_bob].polarizzazione = pz;
-              chiave_bob[indice_qubit_chiave_bob].accettato = 1;
-              indice_qubit_chiave_bob++;
-              //salva qubit nella chiave di ALice
-              chiave_alice[indice_qubit_chiave_alice].polarizzazione = alice_f.polarizzazione;
-              chiave_alice[indice_qubit_chiave_alice].accettato = 1;
-              indice_qubit_chiave_alice++;
-              //salva qubit nella chiave di Eva
-              
-              
-              for(int i=0; i<indice_qubit_chiave_bob;i++)
-                {
-                  if(chiave_bob[i].accettato == 1)
-                    printf("\x1b[%d;%dH%d",RIGA+5,COLONNA+i,chiave_bob[i].polarizzazione);
+                  if(eva_flag)
+                    {
+                      alice_f =  quanto_emetti_fotone(alice_base);
+                      bob_f=quanto_intercetta
+                        ( alice_f, alice_base,chiave_eva);
+                    }
                   else
-                    printf("\x1b[%d;%dH-",RIGA+5,COLONNA+i);
-                }
-
-              //Cancella il qubit registrato dallo schermo
-              printf("\x1b[%d;9H-",RIGA+3);
-
-              //Pone la base suggerita per alice ad indeterminata
-              alice_base = INDETERMINATA;
-              descrizione(alice_base, desc,BASI);
-              printf("\x1b[%d;17H%s",RIGA+3,desc);
-              
-              printf("\x1b[%d;%dH",riga,colonna);
-              fflush(stdout);
-              break;
-
-            case CTRL_KEY('C'):
-              //l'indice del qubit è dato dalla
-              //posizione del cursore rispetto l'inizio della sequenza di qubit salvati
-              inx = colonna-(COLONNA) ;
-              tmp = chiave_alice[inx].polarizzazione ;
-              if(chiave_bob[inx].accettato)
-                {
-                  printf("\x1b[%d;%dH%d",RIGA+DR+2,COLONNA+inx,chiave_alice[inx].polarizzazione);
+                    {
+                      alice_f = quanto_emetti_fotone(alice_base);
+                      bob_f =  alice_f;
+                    }
                   
-                  printf("\x1b[%d;%dH",riga,colonna);
-                  fflush(stdout);
-                }
-              //Eva scopre il valore di questo qubit
-              chiave_eva[inx].polarizzazione = chiave_alice[inx].polarizzazione;
-              break;
-              
-            case CTRL_KEY('K'):
-              //posizione del cursore rispetto l'inizio della sequenza di qubit salvati
-              inx = colonna-(COLONNA) ;
-              chiave_alice[inx].accettato=0 ;
-              chiave_bob[inx].accettato=0 ; 
-              printf("\x1b[%d;%dH-",RIGA+DR+2,COLONNA+inx);
-              printf("\x1b[%d;%dH-",RIGA+DR,COLONNA+inx);
-
-              printf("\x1b[%d;%dH",riga,colonna);
-              fflush(stdout);
-              break;
-
-            case CTRL_KEY('W'):
-
-              /* mostra la chiave di Bob e quella di Alice e le confronta */
-
-              for(int i=0; i<indice_qubit_chiave_bob;i++)
-                {
-                  if(chiave_bob[i].accettato == 1)
-                    {
-                      //il flag è zero se le due chiavi non corrispondono
-                      chiavi_flag = chiavi_flag && chiave_bob[i].polarizzazione == chiave_alice[i].polarizzazione;
-                      printf("\x1b[%d;1HCHIAVE Bob  :\x1b[%d;%dH%d",RIGA+10,RIGA+10,14+i,chiave_bob[i].polarizzazione);
-                      printf("\x1b[%d;1HCHIAVE Alice:\x1b[%d;%dH%d",RIGA+11,RIGA+11,14+i,chiave_alice[i].polarizzazione);
-                      
-                    }
-                      fflush(stdout);
-                }
-              if(chiavi_flag)
-                {
-                  printf("\x1b[%d;%dHBENE: le chiavi corrispondono",RIGA+12,1);
-
-                }
-              else
-                {
-                   printf("\x1b[%d;%dHMALE: le chiavi NON corrispondono",RIGA+12,1);
-                }
-              fflush(stdout);
-              if(eva_flag)
-                {
-                  for(int i=0; i<indice_qubit_chiave_bob;i++)
-                    printf("\x1b[%d;1HCHIAVE Eva :\x1b[%d;%dH%d",RIGA+13,RIGA+13,14+i,chiave_eva[i].polarizzazione);
-                  fflush(stdout);
-                }
-              printf("\x1b[%d;%dH",riga,colonna);
-              break;
-              
-              
-            case ARROW_UP:
-              
-              break;
-            case ARROW_DOWN:
-              break;
-            case ARROW_LEFT:
-              if(colonna>COLONNA)
-                colonna--;
-              printf("\x1b[%d;%dH",riga,colonna);
-              fflush(stdout);
-              break;
-            case ARROW_RIGHT:
-              if(colonna<COLONNA+DIM_CHIAVE)
-                colonna++;
-               printf("\x1b[%d;%dH",riga,colonna);
-               fflush(stdout);
-              break;
-            default:
-              if(32<=ch&&ch<=127)
-                {
-                  if(ch == 'k')
-                    {
-                      printf("\x1b[1;1HBackdoor di EVA: %d",eva_flag);
-                      fflush(stdout);
-                    }
-                  if(ch == 'c')
-                    {
-                      // Bob chiede ad Alice che base ha usato
-                      
-                      descrizione(bob_f.base, desc,BASI);
-                      printf("\x1b[%d;17H%s",RIGA+3,desc);
-
-                      printf("\x1b[%d;%dH",riga,colonna);
-                      fflush(stdout);
-
-                    }
-                   if(ch == 'i')
-                    {
-                      // Bob indica ad Alice la base da usare
-                       if(alice_base == STANDARD)
-                        alice_base = HADAMARD;
-                       else if(alice_base == HADAMARD)
-                           alice_base = INDETERMINATA;
-                       else if(alice_base == INDETERMINATA)
-                             alice_base = STANDARD;
-                       
-                       descrizione(alice_base, desc,BASI);
-                       printf("\x1b[%d;17H%s",RIGA+3,desc);
-                       
+                  pz = quanto_rivela_fotone(bob_f,bob_base);
+                  
+                  if(pz)
+                     {
+                       // evidenzia il nuovo qubit
+                       printf("\x1b[%d;6H>    | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H >   | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H  >  | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H   > | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H    >| ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H     * ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H     | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H       ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                     }
+                   else
+                     {
+                       // evidenzia il nuovo qubit
+                       printf("\x1b[%d;6H>    | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H >   | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H  >  | ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H   > | ",RIGA+3);
+                       fflush(stdout);
+                       printf("\x1b[%d;6H    >| ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H     > ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H     |>",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                       printf("\x1b[%d;6H       ",RIGA+3);
+                       fflush(stdout);
+                       nanosleep(&tc, 0);
+                     }
+                   printf("\x1b[%d;9H%d",RIGA+3,pz);
+                   
+                   printf("\x1b[%d;%dH",riga,colonna);
+                   fflush(stdout);
+                   break;
+                 }
+               
+               /* Scopri se Eva sta intercettando */
+               if(ch == 'k')
+                 {
+                   printf("\x1b[1;1HBackdoor di EVA: %d",eva_flag);
+                   fflush(stdout);
+                 }
+               
+               /* Vedi base Alice  */
+               if(ch == 'i')
+                 {
+                   descrizione(bob_f.base, desc,BASI);
+                   printf("\x1b[%d;17H%s",RIGA+3,desc);
+                   
+                   printf("\x1b[%d;%dH",riga,colonna);
+                   fflush(stdout);
+                 }
+               
+               /* Confronta qubit selezionato */
+               if(ch == 'c')
+                 {
+                   //l'indice del qubit è dato dalla
+                   //posizione del cursore rispetto l'inizio della sequenza di qubit salvati
+                   inx = colonna-(COLONNA) ;
+                   tmp = chiave_alice[inx].polarizzazione ;
+                   if(chiave_bob[inx].accettato>0 && inx<DIM_CHIAVE)
+                     {
+                       printf("\x1b[%d;%dH%d",RIGA+DR+2,COLONNA+inx,chiave_alice[inx].polarizzazione);                    
                        printf("\x1b[%d;%dH",riga,colonna);
                        fflush(stdout);
-
-                    }
-
-                  
-                  if(ch == 'b')
-                    {
-                      //Bob cambia la propia base
-                      if(bob_base == STANDARD)
-                        bob_base = HADAMARD;
-                      else
-                        bob_base = STANDARD;
-
-                      descrizione(bob_base, desc,BASI);
-                      printf("\x1b[%d;32H%s",RIGA+3,desc);
-
-                      printf("\x1b[%d;%dH",riga,colonna);
-                      fflush(stdout);
-
-                    }
-                }
-              
-            break;
-          }
-    }
-
-      /* controlla se le basi corrispondono */
-      if(1 == 1)
-        {
-          n_qubit_segnati ++;
-          indice_qubit_chiave_bob ++;
-        }
-    }
-
-   for(int i=0;i<DIM_CHIAVE;i++)
-    {
-      printf("%d\t",chiave_bob[i].polarizzazione);
-
-    }
-
+                     }
+                   //Il confronto tra Bob e Alice prevede la trasmissione del valore
+                   //del qubit sul canale classico:
+                   //Eva scopre il valore di questo qubit
+                   chiave_eva[inx].polarizzazione = chiave_alice[inx].polarizzazione;
+                   break;
+                 }
+             }
+           
+           break;
+         }
+     }
+   
 }
 
 /*_______________________________________________________
@@ -484,9 +491,8 @@ void descrizione(int valore, char * buffer,DIZIONARIO diz)
 
 /*____________________________________________________
   
-  Con una certa probabilità Eva cerca di intercettare
-  il  canale quantistico di comunicazione
-
+  Con una certa probabilità Eva decide di intercettare
+  la comunicazione della chiave tra Alice e Bob
  */
 char eva_intercetta()
 {
@@ -497,8 +503,8 @@ char eva_intercetta()
 
 /*____________________________________________________
 
-  Bon ha ricevuto un fotone da Alice. Il fotone di 
-  alice è stato già rivelato nel sistema di ALice 
+  Bob ha ricevuto un fotone da Alice. Il fotone di 
+  Alice è stato già rivelato nel sistema di Alice 
   e ora verrà rivelato in quello di Bob. Lo stato 
   in cui si trova il fotone di Bob è lo stesso di quello
   di ALice, ma se Bob usa una base di rivelazione
@@ -507,11 +513,9 @@ char eva_intercetta()
  */
 POLARIZZAZIONE quanto_rivela_fotone(FOTONE f,BASE b)
 {
-
-    
   if( b == f.base)
     return f.polarizzazione;
-
+  
   float quanto_psi2 = (float)rand()/(float)RAND_MAX;
   
   if(quanto_psi2>0.5)
@@ -533,9 +537,6 @@ FOTONE quanto_intercetta(FOTONE emesso, BASE base_alice, QNODO chiave_eva[])
   BASE b = base_alice;
   FOTONE p = emesso;
   FOTONE impostore;
-  printf("\x1b[30;1H                      ");
-  printf("\x1b[31;1H                      ");
-  
    
   if(base_alice == INDETERMINATA)
     {
@@ -600,12 +601,9 @@ FOTONE quanto_intercetta(FOTONE emesso, BASE base_alice, QNODO chiave_eva[])
   Bob chiede ad alice di emettere un fotone
   Alice sceglie una base ed emette una copia
   di fotoni che hanno lo stesso stato quantico
-  uno viene rivelato dal rivelatore di alice
-  che inserisce nella sua chiave il valore
-  di polarizzazione misurato
-  l'altro viene mandato a Bob che lo rivela e 
-  inserisce a sua volta il valore di polarizzazione
-  nella sua chiave
+  uno viene rivelato dal rivelatore di Alice
+  l'altro viene mandato a Bob che lo rivela e
+  vi associa il valore di un qubit
  */
 FOTONE quanto_emetti_fotone(BASE base_suggerita)
 {
