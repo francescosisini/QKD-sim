@@ -81,7 +81,7 @@ int main()
   init();
 
    /* presentazione */
-  printf("\x1b[2J\x1b[1;1H\nquanta_: criptazione quantistica (bob) \n");
+  printf("\x1b[2J\x1b[1;1H\nquanta_: correlazione quantistica (bob) \n");
   printf("\x1b[1;1H");
   printf("(C)Scuola_Sisini 2019 https://pumar.it\n\n\n\r");
   printf("_________________________________________________________________\n\r");
@@ -103,8 +103,8 @@ int main()
   printf("FRECCE SX/DX  seleziona qubit\n\r");
   printf("     <c>      confronta qubit selezionato\n\r");
   printf("CTRL-<k>      elimina qubit selezionato\n\r");
-  printf("CTRL-<w>      accetta la chiave\n\r");
-  printf("CTRL-<x>      rifiuta la chiave\n\r");
+  printf("CTRL-<w>      confronta la chiave\n\r");
+  printf("CTRL-<x>      esci\n\r");
   printf("_________________________________________________________________\n\r");
   printf("\x1b[%d;1HQubit salvati :",RIGA+5+11);
   printf("\x1b[%d;1HCHIAVE Bob    :",RIGA+6+11);
@@ -416,7 +416,7 @@ int main()
                /* Scopri se Eva sta intercettando */
                if(ch == 'k')
                  {
-                   printf("\x1b[1;1HBackdoor di EVA: %d",eva_flag);
+                   printf("\x1b[35;1HBackdoor di EVA: %d",eva_flag);
                    fflush(stdout);
                  }
                
@@ -532,7 +532,8 @@ POLARIZZAZIONE quanto_rivela_fotone(FOTONE f,BASE b)
    e di ritrasmetterlo identico a Bob senza che lui se ne
    accorga
   */
-FOTONE quanto_intercetta(FOTONE emesso, BASE base_alice, QNODO chiave_eva[])
+FOTONE quanto_intercetta
+(FOTONE emesso, BASE base_alice, QNODO chiave_eva[])
 {
   BASE b = base_alice;
   FOTONE p = emesso;
@@ -605,7 +606,8 @@ FOTONE quanto_intercetta(FOTONE emesso, BASE base_alice, QNODO chiave_eva[])
   l'altro viene mandato a Bob che lo rivela e
   vi associa il valore di un qubit
  */
-FOTONE quanto_emetti_fotone(BASE base_suggerita)
+FOTONE
+quanto_emetti_fotone(BASE base_suggerita)
 {
   FOTONE p;
   BASE b;
