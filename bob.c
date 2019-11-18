@@ -7,7 +7,7 @@
 /*_____________________________________
 
                Alice e Bob
-            @francesco_sisini
+          @francesco_sisini 2019
              _scuola_sisini_
  */
 
@@ -54,20 +54,14 @@ typedef struct qnodo {
 
 
 /*____________________________________________________*/
+
 FOTONE quanto_emetti_fotone(BASE base_emissione);
 
 FOTONE quanto_intercetta(FOTONE f, BASE base_emissione, QNODO chiave[]);
 
 POLARIZZAZIONE quanto_rivela_fotone(FOTONE f,BASE b);
 
-BASE classico_bob2alice_richiedi_base(FOTONE f);
-
-char classico_bob2aliceconferma_polarizzazione(POLARIZZAZIONE p);
-
 /*____________________________________________________*/
-void scrivi_qubit(POLARIZZAZIONE p, QNODO * chiave);
-
-void elimina_qubit(QNODO * qn);
 
 void descrizione(int valore, char * buffer,DIZIONARIO diz);
 
@@ -146,12 +140,11 @@ int main()
   POLARIZZAZIONE tmp;
   int inx;
 
+  /* per l'attesa duranta l'animazione */
   struct timespec tc;
   tc.tv_sec = 0.3;
   tc.tv_nsec =333333333;
-  
-  int n_qubit_segnati = 0;
-
+ 
   srand(time(0));
   
   eva_flag = eva_intercetta();
@@ -601,7 +594,7 @@ FOTONE quanto_intercetta
  
   Bob chiede ad alice di emettere un fotone
   Alice sceglie una base ed emette una copia
-  di fotoni che hanno lo stesso stato quantico
+  di fotoni entangled
   uno viene rivelato dal rivelatore di Alice
   l'altro viene mandato a Bob che lo rivela e
   vi associa il valore di un qubit
