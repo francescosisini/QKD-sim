@@ -105,6 +105,10 @@ int main()
   printf("\x1b[%d;1HCHIAVE Alice  :",RIGA+7+11);
   fflush(stdout);
 
+
+  //Flag abilitazione alla scrittura qubit
+  char qubit_scrivibile = 0;
+  
   //Flag di intrusione di Eva
   char eva_flag = 0;
 
@@ -214,6 +218,13 @@ int main()
           
           /* Salva qubit */
         case CTRL_KEY('S'):
+
+          if(!qubit_scrivibile)
+            break;
+          //Dopo aver scalvato un qubit ne devo ricevere un'altro prima di poter salvare di nuovo
+          qubit_scrivibile = 0;
+          
+           
           //salva qubit nella chiave di Bob
           chiave_bob[indice_qubit_chiave_bob].polarizzazione = pz;
           chiave_bob[indice_qubit_chiave_bob].accettato = 1;
@@ -326,6 +337,9 @@ int main()
               if(ch == 'a')
                 {
                   /* una coppia di fotoni viene emessa nel sistema di Alice */
+
+                  qubit_scrivibile = 1;
+                  
                   descrizione(alice_base, desc,BASI);
                   printf("\x1b[%d;17H%s",RIGA+3,desc);
                   fflush(stdout);
@@ -536,7 +550,8 @@ FOTONE quanto_intercetta
     {
      
       //Bob non ha chiesto ad Alice la base prima che lei inviasse
-      //il fotone, quindi Eva non può conoscerla
+      //il fotone, quindi Eva non può conoscerla e ne sceglie una
+      //casualmente
       
       float classico_scelta = (float)rand()/(float)RAND_MAX;
       
@@ -552,7 +567,7 @@ FOTONE quanto_intercetta
       if(b == emesso.base)
         {
           
-          //Eva ha azzeccato la base
+          //Eva ha azzeccato la base per cao
           impostore =  emesso;
         }
       else
@@ -592,20 +607,19 @@ FOTONE quanto_intercetta
 
   /*_____________________________________________________
  
-  Bob chiede ad alice di emettere un fotone
-  Alice sceglie una base ed emette una copia
-  di fotoni entangled
-  uno viene rivelato dal rivelatore di Alice
-  l'altro viene mandato a Bob che lo rivela e
-  vi associa il valore di un qubit
+    Bob chiede ad alice di emettere un fotone
+    Alice sceglie una base per il suo rivelatore
+    ed emette una coppia di fotoni entangled
+    Uno viene rivelato dal rivelatore di Alice
+    l'altro viene mandato a Bob che lo rivela e
+    vi associa il valore di un qubit
  */
-FOTONE
-quanto_emetti_fotone(BASE base_suggerita)
+FOTONE quanto_emetti_fotone(BASE base_suggerita)
 {
   FOTONE p;
   BASE b;
 
-  if(base_suggerita !=INDETERMINATA)
+  if(base_suggerita != INDETERMINATA)
     b = base_suggerita;
   else
     {
