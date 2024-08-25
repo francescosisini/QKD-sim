@@ -7,9 +7,38 @@
 /*_____________________________________
 
                Alice e Bob
-          @francesco_sisini 2019
+          @francesco_sisini 2019-24
              _scuola_sisini_
  */
+
+/*
+    Simulazione del Protocollo QKD (Quantum Key Distribution) - Variante BB84
+
+    Questo programma simula il protocollo BB84 per la distribuzione quantistica delle chiavi
+    (QKD), che consente a due partecipanti (Alice e Bob) di condividere una chiave crittografica 
+    segreta utilizzando le proprietà della meccanica quantistica. Il programma genera fotoni 
+    polarizzati e mostra come, attraverso la scelta delle basi di misura (Standard o Hadamard),
+    Alice e Bob possono rilevare eventuali tentativi di intercettazione (Eve) e garantire la 
+    sicurezza della chiave distribuita.
+
+    Il programma è destinato a scopi didattici e dimostrativi, aiutando a comprendere come funziona 
+    il protocollo QKD e come la fisica quantistica possa essere utilizzata per la sicurezza delle 
+    comunicazioni.
+
+    Questo programma è software libero: puoi redistribuirlo e/o modificarlo 
+    secondo i termini della GNU General Public License come pubblicata dalla 
+    Free Software Foundation, sia la versione 3 della Licenza, oppure (a tua scelta) 
+    qualsiasi versione successiva.
+
+    Questo programma è distribuito nella speranza che possa essere utile,
+    ma SENZA ALCUNA GARANZIA; senza neppure la garanzia implicita di 
+    COMMERCIABILITÀ o IDONEITÀ PER UNO SCOPO PARTICOLARE. 
+    Vedi la GNU General Public License per maggiori dettagli.
+
+    Dovresti aver ricevuto una copia della GNU General Public License 
+    insieme a questo programma. In caso contrario, visita <http://www.gnu.org/licenses/>.
+*/
+
 
 #define DIM_CHIAVE 32
 #define RIGA 12
