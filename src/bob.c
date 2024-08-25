@@ -106,7 +106,7 @@ int main()
    /* presentazione */
   printf("\x1b[2J\x1b[1;1H\nquanta_: correlazione quantistica (bob) \n");
   printf("\x1b[1;1H");
-  printf("(C)Scuola_Sisini 2019 https://pumar.it\n\n\n\r");
+  printf("(C)Scuola_Sisini 2019-24 https://www.scuolasisini.com\n\n\n\r");
   printf("_________________________________________________________________\n\r");
   printf("     <a> ricevi fotone       (c. quantistico)\n\r");
   printf("CTRL-<s> salva qubit         (locale)\n\r");
