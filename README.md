@@ -22,8 +22,8 @@ L'obiettivo di questo progetto è fornire una comprensione pratica e intuitiva d
 Per clonare il repository, eseguire il seguente comando:
 
 ```bash
-git clone https://github.com/francescosisini/qkd-simulation.git
-cd qkd-simulation
+git clone https://github.com/francescosisini/QKD-sim.git
+cd QKD-sim
 ```
 Compilazione del programma
 
